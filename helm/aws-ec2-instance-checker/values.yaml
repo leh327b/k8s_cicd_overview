@@ -1,0 +1,35 @@
+namespace: aws-ec2-instance-checker
+frontend:
+  replicaCount: 3
+
+  image:
+    repository: leh327/checker
+    tag: 3.0.0
+    pullPolicy: Always 
+
+  service:
+    type: LoadBalancer
+    port: 80
+    targetPort: 5000
+
+  containerPort: 5000
+
+
+opa:
+  replicaCount: 1
+  image:
+    repository: openpolicyagent/opa
+    tag: 0.54.0
+    pullPolicy: Always
+  service:
+    type: LoadBalancer
+    port: 8181
+  containerPort: 8181
+  policy: |
+    package ec2
+
+    default match = false
+
+    match {
+        input.MetadataOptions.HttpTokens == "optional"
+    }
